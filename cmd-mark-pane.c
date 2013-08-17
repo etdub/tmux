@@ -23,23 +23,34 @@
 #include "tmux.h"
 
 /*
- * Kill pane.
+ * Mark a pane.
  */
 
-enum cmd_retval	 cmd_kill_pane_exec(struct cmd *, struct cmd_q *);
+enum cmd_retval	 cmd_mark_pane_exec(struct cmd *, struct cmd_q *);
+enum cmd_retval	 cmd_unmark_pane_exec(struct cmd *, struct cmd_q *);
 
-const struct cmd_entry cmd_kill_pane_entry = {
-	"kill-pane", "killp",
+const struct cmd_entry cmd_mark_pane_entry = {
+	"mark-pane", "markp",
 	"at:", 0, 0,
 	"[-a] " CMD_TARGET_PANE_USAGE,
 	0,
 	NULL,
 	NULL,
-	cmd_kill_pane_exec
+	cmd_mark_pane_exec
+};
+
+const struct cmd_entry cmd_unmark_pane_entry = {
+	"unmark-pane", "unmarkp",
+	"at:", 0, 0,
+	"[-a] " CMD_TARGET_PANE_USAGE,
+	0,
+	NULL,
+	NULL,
+	cmd_mark_pane_exec
 };
 
 enum cmd_retval
-cmd_kill_pane_exec(struct cmd *self, struct cmd_q *cmdq)
+cmd_mark_pane_exec(struct cmd *self, struct cmd_q *cmdq)
 {
 	struct args		*args = self->args;
 	struct winlink		*wl;
@@ -49,29 +60,11 @@ cmd_kill_pane_exec(struct cmd *self, struct cmd_q *cmdq)
 		return (CMD_RETURN_ERROR);
 	server_unzoom_window(wl->window);
 
-	if (window_count_panes(wl->window) == 1) {
-		/* Only one pane, kill the window. */
-		server_kill_window(wl->window);
-		recalculate_sizes();
-		return (CMD_RETURN_NORMAL);
-	}
-
-	if (args_has(self->args, 'a')) {
-		TAILQ_FOREACH_SAFE(loopwp, &wl->window->panes, entry, tmpwp) {
-			if (loopwp == wp)
-				continue;
-			layout_close_pane(loopwp);
-			window_remove_pane(wl->window, loopwp);
-		}
-	} else {
-                log_debug("Begin remove pane for kill");
-		layout_close_pane(wp);
-		window_remove_pane(wl->window, wp);
-                log_debug("Finish remove pane for kill");
-	}
-        log_debug("Begin redraw after kill");
-	server_redraw_window(wl->window);
-        log_debug("Finish redraw after kill");
+        if (self->entry == &cmd_unmark_pane_entry) {
+                window_unmark_pane(wl->window, wp);
+        } else {
+                window_mark_pane(wl->window, wp);
+        }
 
 	return (CMD_RETURN_NORMAL);
 }

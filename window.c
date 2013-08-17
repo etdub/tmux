@@ -279,6 +279,7 @@ window_create1(u_int sx, u_int sy)
 	w->flags = 0;
 
 	TAILQ_INIT(&w->panes);
+        TAILQ_INIT(&w->marked_panes);
 	w->active = NULL;
 
 	w->lastlayout = -1;
@@ -527,6 +528,8 @@ window_add_pane(struct window *w, u_int hlimit)
 void
 window_remove_pane(struct window *w, struct window_pane *wp)
 {
+        window_unmark_pane(w, wp);
+
 	if (wp == w->active) {
 		w->active = w->last;
 		w->last = NULL;
@@ -540,6 +543,29 @@ window_remove_pane(struct window *w, struct window_pane *wp)
 
 	TAILQ_REMOVE(&w->panes, wp, entry);
 	window_pane_destroy(wp);
+}
+
+void
+window_mark_pane(struct window *w, struct window_pane *wp)
+{
+        log_debug("Pre mark pane, marked_panes == %d", window_count_marked_panes(w));
+        TAILQ_INSERT_TAIL(&w->marked_panes, wp, entry);
+        log_debug("Post mark pane, marked_panes == %d", window_count_marked_panes(w));
+}
+
+void
+window_unmark_pane(struct window *w, struct window_pane *wp)
+{
+        struct window_pane      *wq;
+
+        log_debug("Pre unmark pane, marked_panes == %d", window_count_marked_panes(w));
+        TAILQ_FOREACH(wq, &w->marked_panes, entry) {
+                if (wp == wq) {
+                        TAILQ_REMOVE(&w->marked_panes, wq, entry);
+                        break;
+                }
+        }
+        log_debug("Post unmark pane, marked_panes == %d", window_count_marked_panes(w));
 }
 
 struct window_pane *
@@ -607,6 +633,18 @@ window_count_panes(struct window *w)
 	TAILQ_FOREACH(wp, &w->panes, entry)
 		n++;
 	return (n);
+}
+
+u_int
+window_count_marked_panes(struct window *w)
+{
+        struct window_pane      *wp;
+        u_int                   n;
+
+        n = 0;
+        TAILQ_FOREACH(wp, &w->marked_panes, entry)
+                n++;
+        return (n);
 }
 
 void
@@ -731,6 +769,8 @@ window_pane_destroy(struct window_pane *wp)
 	free(wp->shell);
 	free(wp->cmd);
 	free(wp);
+
+        log_debug("Finished destroying pane");
 }
 
 int
