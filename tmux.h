@@ -991,7 +991,7 @@ struct window {
 	struct window_pane *active;
 	struct window_pane *last;
 	struct window_panes panes;
-        struct window_panes marked_panes;
+	struct window_panes marked_panes;
 
 	int		 lastlayout;
 	struct layout_cell *layout_root;

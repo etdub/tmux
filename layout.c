@@ -772,7 +772,7 @@ layout_split_pane(
 void
 layout_close_pane(struct window_pane *wp)
 {
-        log_debug("Begin layout_close_pane");
+	log_debug("Begin layout_close_pane");
 	/* Remove the cell. */
 	layout_destroy_cell(wp->layout_cell, &wp->window->layout_root);
 
@@ -782,5 +782,5 @@ layout_close_pane(struct window_pane *wp)
 		layout_fix_panes(wp->window, wp->window->sx, wp->window->sy);
 	}
 	notify_window_layout_changed(wp->window);
-        log_debug("Finish layout_close_pane");
+	log_debug("Finish layout_close_pane");
 }
