@@ -121,10 +121,12 @@ cmd_split_window_exec(struct cmd *self, struct cmd_q *cmdq)
 		cause = xstrdup("pane too small");
 		goto error;
 	}
+	log_debug("Before window add_pane, num_panes == %d, num_marked_panes == %d", window_count_panes(w), window_count_marked_panes(w));
 	new_wp = window_add_pane(w, hlimit);
 	if (window_pane_spawn(
 	    new_wp, cmd, shell, cwd, &env, s->tio, &cause) != 0)
 		goto error;
+	log_debug("after window add_pane, num_panes == %d, num_marked_panes == %d", window_count_panes(w), window_count_marked_panes(w));
 	layout_assign_pane(lc, new_wp);
 
 	server_redraw_window(w);
@@ -155,7 +157,9 @@ cmd_split_window_exec(struct cmd *self, struct cmd_q *cmdq)
 
 		format_free(ft);
 	}
+	log_debug("Before window layout notify, num_panes == %d, num_marked_panes == %d", window_count_panes(w), window_count_marked_panes(w));
 	notify_window_layout_changed(w);
+	log_debug("After window layout notify, num_panes == %d, num_marked_panes == %d", window_count_panes(w), window_count_marked_panes(w));
 	return (CMD_RETURN_NORMAL);
 
 error:
