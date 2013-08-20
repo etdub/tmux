@@ -548,6 +548,14 @@ window_remove_pane(struct window *w, struct window_pane *wp)
 void
 window_mark_pane(struct window *w, struct window_pane *wp)
 {
+	struct window_pane      *wq;
+
+	TAILQ_FOREACH(wq, &w->marked_panes, marked_entry) {
+		if (wp == wq)
+			return;
+	}
+
+
 	log_debug("Pre mark pane, marked_panes == %d", window_count_marked_panes(w));
 	if (TAILQ_EMPTY(&w->marked_panes))
 		TAILQ_INSERT_HEAD(&w->marked_panes, wp, marked_entry);
