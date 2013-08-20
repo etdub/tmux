@@ -550,9 +550,9 @@ window_mark_pane(struct window *w, struct window_pane *wp)
 {
 	log_debug("Pre mark pane, marked_panes == %d", window_count_marked_panes(w));
 	if (TAILQ_EMPTY(&w->marked_panes))
-		TAILQ_INSERT_HEAD(&w->marked_panes, wp, entry);
+		TAILQ_INSERT_HEAD(&w->marked_panes, wp, marked_entry);
 	else
-		TAILQ_INSERT_TAIL(&w->marked_panes, wp, entry);
+		TAILQ_INSERT_TAIL(&w->marked_panes, wp, marked_entry);
 	log_debug("Post mark pane, marked_panes == %d", window_count_marked_panes(w));
 }
 
@@ -562,9 +562,9 @@ window_unmark_pane(struct window *w, struct window_pane *wp)
 	struct window_pane      *wq;
 
 	log_debug("Pre unmark pane, marked_panes == %d", window_count_marked_panes(w));
-	TAILQ_FOREACH(wq, &w->marked_panes, entry) {
+	TAILQ_FOREACH(wq, &w->marked_panes, marked_entry) {
 		if (wp == wq) {
-			TAILQ_REMOVE(&w->marked_panes, wq, entry);
+			TAILQ_REMOVE(&w->marked_panes, wq, marked_entry);
 			break;
 		}
 	}
@@ -645,7 +645,7 @@ window_count_marked_panes(struct window *w)
 	u_int		   n;
 
 	n = 0;
-	TAILQ_FOREACH(wp, &w->marked_panes, entry)
+	TAILQ_FOREACH(wp, &w->marked_panes, marked_entry)
 		n++;
 	return (n);
 }

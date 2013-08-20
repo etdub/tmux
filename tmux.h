@@ -976,6 +976,7 @@ struct window_pane {
 	void		*modedata;
 
 	TAILQ_ENTRY(window_pane) entry;
+	TAILQ_ENTRY(window_pane) marked_entry;
 	RB_ENTRY(window_pane) tree_entry;
 };
 TAILQ_HEAD(window_panes, window_pane);
