@@ -64,14 +64,10 @@ cmd_kill_pane_exec(struct cmd *self, struct cmd_q *cmdq)
 			window_remove_pane(wl->window, loopwp);
 		}
 	} else {
-		log_debug("Begin remove pane for kill");
 		layout_close_pane(wp);
 		window_remove_pane(wl->window, wp);
-		log_debug("Finish remove pane for kill");
 	}
-	log_debug("Begin redraw after kill");
 	server_redraw_window(wl->window);
-	log_debug("Finish redraw after kill");
 
 	return (CMD_RETURN_NORMAL);
 }

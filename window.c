@@ -555,13 +555,10 @@ window_mark_pane(struct window *w, struct window_pane *wp)
 			return;
 	}
 
-
-	log_debug("Pre mark pane, marked_panes == %d", window_count_marked_panes(w));
 	if (TAILQ_EMPTY(&w->marked_panes))
 		TAILQ_INSERT_HEAD(&w->marked_panes, wp, marked_entry);
 	else
 		TAILQ_INSERT_TAIL(&w->marked_panes, wp, marked_entry);
-	log_debug("Post mark pane, marked_panes == %d", window_count_marked_panes(w));
 }
 
 void
@@ -569,14 +566,12 @@ window_unmark_pane(struct window *w, struct window_pane *wp)
 {
 	struct window_pane      *wq;
 
-	log_debug("Pre unmark pane, marked_panes == %d", window_count_marked_panes(w));
 	TAILQ_FOREACH(wq, &w->marked_panes, marked_entry) {
 		if (wp == wq) {
 			TAILQ_REMOVE(&w->marked_panes, wq, marked_entry);
 			break;
 		}
 	}
-	log_debug("Post unmark pane, marked_panes == %d", window_count_marked_panes(w));
 }
 
 struct window_pane *
@@ -780,8 +775,6 @@ window_pane_destroy(struct window_pane *wp)
 	free(wp->shell);
 	free(wp->cmd);
 	free(wp);
-
-	log_debug("Finished destroying pane");
 }
 
 int
@@ -1092,14 +1085,13 @@ window_pane_key(struct window_pane *wp, struct session *sess, int key)
 	input_key(wp, key);
 	if (options_get_number(&wp->window->options, "synchronize-panes")) {
 		if (window_count_marked_panes(wp->window) > 0) {
-			TAILQ_FOREACH(wp2, &wp->window->marked_panes, entry) {
+			TAILQ_FOREACH(wp2, &wp->window->marked_panes, marked_entry) {
 				if (wp2 == wp || wp2->mode != NULL)
 					continue;
 				if (wp2->fd != -1 && window_pane_visible(wp2))
 					input_key(wp2, key);
 			}
 		} else {
-
 			TAILQ_FOREACH(wp2, &wp->window->panes, entry) {
 				if (wp2 == wp || wp2->mode != NULL)
 					continue;
