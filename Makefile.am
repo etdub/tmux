@@ -103,6 +103,7 @@ dist_tmux_SOURCES = \
 	cmd-list.c \
 	cmd-load-buffer.c \
 	cmd-lock-server.c \
+	cmd-mark-pane.c \
 	cmd-move-window.c \
 	cmd-new-session.c \
 	cmd-new-window.c \

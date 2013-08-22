@@ -936,6 +936,7 @@ struct window_pane {
 	u_int		 xoff;
 	u_int		 yoff;
 
+	u_int		 marked;
 	int		 flags;
 #define PANE_REDRAW 0x1
 #define PANE_DROP 0x2
@@ -1808,6 +1809,7 @@ extern const struct cmd_entry cmd_load_buffer_entry;
 extern const struct cmd_entry cmd_lock_client_entry;
 extern const struct cmd_entry cmd_lock_server_entry;
 extern const struct cmd_entry cmd_lock_session_entry;
+extern const struct cmd_entry cmd_mark_pane_entry;
 extern const struct cmd_entry cmd_move_pane_entry;
 extern const struct cmd_entry cmd_move_window_entry;
 extern const struct cmd_entry cmd_new_session_entry;
@@ -1851,6 +1853,7 @@ extern const struct cmd_entry cmd_swap_window_entry;
 extern const struct cmd_entry cmd_switch_client_entry;
 extern const struct cmd_entry cmd_unbind_key_entry;
 extern const struct cmd_entry cmd_unlink_window_entry;
+extern const struct cmd_entry cmd_unmark_pane_entry;
 extern const struct cmd_entry cmd_up_pane_entry;
 extern const struct cmd_entry cmd_wait_for_entry;
 
@@ -2164,7 +2167,10 @@ struct window_pane *window_pane_previous_by_number(struct window *,
 		        struct window_pane *, u_int);
 int		 window_pane_index(struct window_pane *, u_int *);
 u_int		 window_count_panes(struct window *);
+u_int		 window_count_marked_panes(struct window *);
 void		 window_destroy_panes(struct window *);
+void		 window_mark_pane(struct window *, struct window_pane *);
+void		 window_mark_pane(struct window *, struct window_pane *);
 struct window_pane *window_pane_find_by_id(u_int);
 struct window_pane *window_pane_create(struct window *, u_int, u_int, u_int);
 void		 window_pane_destroy(struct window_pane *);

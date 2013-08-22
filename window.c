@@ -597,6 +597,7 @@ window_pane_index(struct window_pane *wp, u_int *i)
 	return (-1);
 }
 
+
 u_int
 window_count_panes(struct window *w)
 {
@@ -609,6 +610,18 @@ window_count_panes(struct window *w)
 	return (n);
 }
 
+u_int
+window_count_marked_panes(struct window *w)
+{
+	struct window_pane 	*wp;
+	u_int			 n;
+
+	n = 0;
+	TAILQ_FOREACH(wp, &w->panes, entry)
+		if (wp->marked == 1)
+			n++;
+	return (n);
+}
 void
 window_destroy_panes(struct window *w)
 {
@@ -619,6 +632,18 @@ window_destroy_panes(struct window *w)
 		TAILQ_REMOVE(&w->panes, wp, entry);
 		window_pane_destroy(wp);
 	}
+}
+
+void
+window_mark_pane(struct window *w, struct window_pane *wp)
+{
+	wp->marked = 1;
+}
+
+void
+window_unmark_pane(struct window *w, struct window_pane *wp)
+{
+	wp->marked = 0;
 }
 
 /* Return list of printable window flag symbols. No flags is just a space. */
@@ -676,6 +701,7 @@ window_pane_create(struct window *w, u_int sx, u_int sy, u_int hlimit)
 
 	wp->fd = -1;
 	wp->event = NULL;
+	wp->marked = 0;
 
 	wp->mode = NULL;
 
@@ -1044,7 +1070,8 @@ window_pane_key(struct window_pane *wp, struct session *sess, int key)
 			if (wp2 == wp || wp2->mode != NULL)
 				continue;
 			if (wp2->fd != -1 && window_pane_visible(wp2))
-				input_key(wp2, key);
+				if (window_count_marked_panes(wp->window) == 0 || (window_count_marked_panes(wp->window) > 0 && wp2->marked == 1))
+					input_key(wp2, key);
 		}
 	}
 }
